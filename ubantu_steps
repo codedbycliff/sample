@@ -177,8 +177,10 @@ You should see:
 ftp-project/
     index.html
 ```
-
 Experiment 9 complete
+
+
+
 
 # Experiment 10: Remote Access and Git Synchronization
 
@@ -317,6 +319,8 @@ You should see the latest changes.
 6. Open it and verify the updated content.
 
 Experiment 10 complete
+
+
 
 # Experiment 11: Split Deployment Website with Form and MySQL Backend
 
@@ -654,6 +658,8 @@ $conn = new mysqli("localhost", "studentapp", "Student@123", "studentdb");
 ```
 
 Save the file. Now test the form again.
+
+
 
 # Experiment 12: Build and Deploy Static Website using GitHub and Vercel
 
