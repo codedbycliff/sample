@@ -1,21 +1,3 @@
-We'll complete Experiments 9, 10, 11 and 12 from scratch on your Windows PC, using simple commands and step-by-step instructions.
-
-### Tools required
-
-- Windows PC (Host)
-- Ubuntu VM in VirtualBox
-- Git and GitHub account
-- FileZilla
-- VS Code
-- MySQL
-- Vercel account
-
-We'll use:
-
-- Windows: Host machine
-- Ubuntu: Virtual machine
-- FileZilla: File transfer
-- GitHub: Version control and repository hosting
 
 # Experiment 9: FTP File Transfer to VM and GitHub Push
 
