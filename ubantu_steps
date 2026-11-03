@@ -1,0 +1,855 @@
+We'll complete Experiments 9, 10, 11 and 12 from scratch on your Windows PC, using simple commands and step-by-step instructions.
+
+### Tools required
+
+- Windows PC (Host)
+- Ubuntu VM in VirtualBox
+- Git and GitHub account
+- FileZilla
+- VS Code
+- MySQL
+- Vercel account
+
+We'll use:
+
+- Windows: Host machine
+- Ubuntu: Virtual machine
+- FileZilla: File transfer
+- GitHub: Version control and repository hosting
+
+# Experiment 9: FTP File Transfer to VM and GitHub Push
+
+Aim: Transfer files from Windows to Ubuntu VM using FTP, initialize a Git repository and push it to GitHub.
+
+## Step 1. Configure Ubuntu VM network
+
+1. Open VirtualBox.
+2. Select your Ubuntu VM.
+3. Go to Settings → Network.
+4. Set Adapter 1 to Bridged Adapter.
+5. Start Ubuntu.
+
+## Step 2. Install FTP server on Ubuntu
+
+Open Ubuntu Terminal:
+
+```
+sudo apt update
+sudo apt install vsftpd -y
+```
+
+Start FTP:
+
+```
+sudo systemctl start vsftpd
+sudo systemctl enable vsftpd
+```
+
+Check status:
+
+```
+sudo systemctl status vsftpd
+```
+
+Press `q` to exit.
+
+## Step 3. Get Ubuntu IP address
+
+```
+hostname -I
+```
+
+Example output:
+
+```
+192.168.1.105
+```
+
+Note your actual IP address.
+
+## Step 4. Create a project folder
+
+```
+mkdir -p ~/ftp-project
+```
+
+Create a sample file:
+
+```
+echo "Hello from Ubuntu VM" > ~/ftp-project/index.html
+```
+
+## Step 5. Configure FTP
+
+Open configuration:
+
+```
+sudo nano /etc/vsftpd.conf
+```
+
+Find and ensure these settings are enabled:
+
+```
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+```
+
+Save using `Ctrl + O`, Enter, then `Ctrl + X`.
+
+Restart FTP:
+
+```
+sudo systemctl restart vsftpd
+```
+
+## Step 6. Connect using FileZilla on Windows
+
+1. Install FileZilla Client on Windows.
+2. Open FileZilla.
+3. Enter:
+
+| Field    | Value                |
+| -------- | -------------------- |
+| Host     | Ubuntu IP address    |
+| Username | Your Ubuntu username |
+| Password | Your Ubuntu password |
+| Port     | 21                   |
+
+4. Click Quickconnect.
+5. On the right side, open:
+
+```
+/home/your-username/ftp-project
+```
+
+6. On the left side, select a file from Windows.
+7. Drag it to the right side.
+
+Your file is now transferred to Ubuntu.
+
+## Step 7. Initialize Git repository in Ubuntu
+
+```
+cd ~/ftp-project
+```
+
+Initialize Git:
+
+```
+git init
+```
+
+Add files:
+
+```
+git add .
+```
+
+Commit:
+
+```
+git commit -m "Initial commit"
+```
+
+Set branch:
+
+```
+git branch -M main
+```
+
+## Step 8. Create GitHub repository
+
+1. Open [GitHub](https://github.com?utm_source=chatgpt.com).
+2. Click New Repository.
+3. Repository name: `ftp-project`
+4. Select Public.
+5. Do not initialize with README.
+6. Click Create Repository.
+
+Copy the repository URL.
+
+## Step 9. Push to GitHub
+
+Replace the URL below with your actual repository URL:
+
+```
+git remote add origin https://github.com/USERNAME/ftp-project.git
+```
+
+Push:
+
+```
+git push -u origin main
+```
+
+If GitHub asks for authentication, complete its browser authentication flow.
+
+## Step 10. Verify
+
+Open your GitHub repository.
+
+You should see:
+
+```
+ftp-project/
+    index.html
+```
+
+Experiment 9 complete
+
+# Experiment 10: Remote Access and Git Synchronization
+
+Aim: Clone a GitHub repository on Windows and Ubuntu VM, synchronize changes using Git and validate using FileZilla.
+
+We will use the GitHub repository created in Experiment 9.
+
+## Step 1. Install Git on Windows
+
+Download Git:
+
+[Download Git for Windows](https://git-scm.com/downloads/win?utm_source=chatgpt.com)
+
+Open PowerShell and verify:
+
+```
+git --version
+```
+
+## Step 2. Clone repository on Windows
+
+Open PowerShell:
+
+```
+cd Desktop
+```
+
+Clone the repository:
+
+```
+git clone https://github.com/USERNAME/ftp-project.git
+```
+
+Enter the folder:
+
+```
+cd ftp-project
+```
+
+## Step 3. Make changes on Windows
+
+Open the project:
+
+```
+notepad index.html
+```
+
+Add:
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Git Synchronization</title>
+</head>
+<body>
+    <h1>Updated from Windows Host</h1>
+    <p>Git synchronization experiment.</p>
+</body>
+</html>
+```
+
+Save and close.
+
+## Step 4. Push changes to GitHub
+
+```
+git add .
+git commit -m "Updated from Windows"
+git push origin main
+```
+
+## Step 5. Clone repository on Ubuntu VM
+
+Open Ubuntu Terminal:
+
+```
+cd ~
+```
+
+Clone the same repository:
+
+```
+git clone https://github.com/USERNAME/ftp-project.git
+```
+
+Enter the folder:
+
+```
+cd ftp-project
+```
+
+Check files:
+
+```
+ls
+```
+
+## Step 6. Synchronize changes
+
+If you make another change on Windows, push it:
+
+```
+git add .
+git commit -m "Second update"
+git push origin main
+```
+
+Now update Ubuntu:
+
+```
+cd ~/ftp-project
+git pull origin main
+```
+
+Verify:
+
+```
+cat index.html
+```
+
+You should see the latest changes.
+
+## Step 7. Validate using FileZilla
+
+1. Open FileZilla on Windows.
+2. Connect to Ubuntu using its IP address.
+3. Enter the remote directory:
+
+```
+/home/your-username/ftp-project
+```
+
+4. Locate `index.html`.
+5. Download it to Windows.
+6. Open it and verify the updated content.
+
+Experiment 10 complete
+
+# Experiment 11: Split Deployment Website with Form and MySQL Backend
+
+Aim: Create a website with a frontend form on Windows and a PHP/MySQL backend on Ubuntu VM.
+
+We'll use:
+
+- Frontend: HTML, CSS and JavaScript
+- Backend: PHP
+- Database: MySQL
+- Server: Apache
+
+## Step 1. Install Apache, PHP and MySQL on Ubuntu
+
+Open Ubuntu Terminal:
+
+```
+sudo apt update
+```
+
+Install everything:
+
+```
+sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql -y
+```
+
+Start services:
+
+```
+sudo systemctl start apache2
+sudo systemctl start mysql
+```
+
+Enable them:
+
+```
+sudo systemctl enable apache2
+sudo systemctl enable mysql
+```
+
+## Step 2. Create MySQL database
+
+Open MySQL:
+
+```
+sudo mysql
+```
+
+Create database:
+
+```
+CREATE DATABASE studentdb;
+```
+
+Select database:
+
+```
+USE studentdb;
+```
+
+Create table:
+
+```
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100)
+);
+```
+
+Check table:
+
+```
+SHOW TABLES;
+```
+
+Exit:
+
+```
+EXIT;
+```
+
+## Step 3. Create PHP backend
+
+Create a folder:
+
+```
+sudo mkdir -p /var/www/html/api
+```
+
+Create PHP file:
+
+```
+sudo nano /var/www/html/api/submit.php
+```
+
+Paste this code:
+
+```
+<?php
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    exit;
+}
+
+$conn = new mysqli("localhost", "root", "", "studentdb");
+
+if ($conn->connect_error) {
+    die("Database connection failed");
+}
+
+$data = json_decode(file_get_contents("php://input"), true);
+
+$name = $data["name"] ?? "";
+$email = $data["email"] ?? "";
+
+$stmt = $conn->prepare(
+    "INSERT INTO students (name, email) VALUES (?, ?)"
+);
+
+$stmt->bind_param("ss", $name, $email);
+
+if ($stmt->execute()) {
+    echo "Student details saved successfully!";
+} else {
+    echo "Error saving details";
+}
+
+$stmt->close();
+$conn->close();
+
+?>
+```
+
+Save using `Ctrl + O`, Enter, `Ctrl + X`.
+
+This example uses Ubuntu's local MySQL root account through the default socket authentication. Do not expose this development setup publicly.
+
+## Step 4. Check Ubuntu IP
+
+```
+hostname -I
+```
+
+Example:
+
+```
+192.168.1.105
+```
+
+## Step 5. Test PHP backend
+
+Open your Windows browser and visit:
+
+```
+http://192.168.1.105/api/submit.php
+```
+
+Replace the IP with your Ubuntu IP.
+
+You may see a blank page because the backend expects a POST request. That is normal.
+
+If the page cannot load, check Ubuntu's firewall:
+
+```
+sudo ufw allow 80/tcp
+```
+
+## Step 6. Create frontend on Windows
+
+Create a folder on your Desktop:
+
+```
+mkdir split-deployment
+cd split-deployment
+```
+
+Create an HTML file:
+
+```
+notepad index.html
+```
+
+Paste:
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+</head>
+
+<body>
+
+    <h2>Student Registration Form</h2>
+
+    <form id="studentForm">
+
+        <input type="text" id="name"
+        placeholder="Enter Name" required>
+
+        <br><br>
+
+        <input type="email" id="email"
+        placeholder="Enter Email" required>
+
+        <br><br>
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+    <p id="result"></p>
+
+    <script>
+
+    document.getElementById("studentForm")
+    .addEventListener("submit", async function(e) {
+
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+
+        try {
+
+            const response = await fetch(
+                "http://192.168.1.105/api/submit.php",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({name, email})
+                }
+            );
+
+            const result = await response.text();
+
+            document.getElementById("result").innerText = result;
+
+        } catch (error) {
+
+            document.getElementById("result").innerText =
+            "Connection failed";
+
+        }
+
+    });
+
+    </script>
+
+</body>
+</html>
+```
+
+Important: Replace `192.168.1.105` with your actual Ubuntu IP address.
+
+## Step 7. Run frontend
+
+Open VS Code.
+
+1. Open the `split-deployment` folder.
+2. Install the Live Server extension.
+3. Right-click `index.html`.
+4. Select Open with Live Server.
+
+Your website will open in the browser.
+
+## Step 8. Test the form
+
+Enter:
+
+```
+Name: Cliff
+Email: cliff@gmail.com
+```
+
+Click Submit.
+
+Expected output:
+
+```
+Student details saved successfully!
+```
+
+## Step 9. Verify MySQL data
+
+On Ubuntu:
+
+```
+sudo mysql
+```
+
+Run:
+
+```
+USE studentdb;
+
+SELECT * FROM students;
+```
+
+You should see the submitted student details.
+
+Experiment 11 complete
+
+Important database configuration: Before testing, create a dedicated MySQL user rather than using root.
+
+On Ubuntu:
+
+```
+sudo mysql
+```
+
+Run:
+
+```
+CREATE USER 'studentapp'@'localhost' IDENTIFIED BY 'Student@123';
+
+GRANT ALL PRIVILEGES ON studentdb.* TO 'studentapp'@'localhost';
+
+FLUSH PRIVILEGES;
+
+EXIT;
+```
+
+In `submit.php`, change the connection line to:
+
+```
+$conn = new mysqli("localhost", "studentapp", "Student@123", "studentdb");
+```
+
+Save the file. Now test the form again.
+
+# Experiment 12: Build and Deploy Static Website using GitHub and Vercel
+
+Aim: Create a static website, upload it to GitHub and deploy it using Vercel.
+
+## Step 1. Create project folder
+
+Open Windows PowerShell:
+
+```
+cd Desktop
+mkdir static-website
+cd static-website
+```
+
+## Step 2. Create HTML file
+
+```
+notepad index.html
+```
+
+Paste:
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>My Static Website</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f0f4f8;
+            padding: 50px;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Welcome to My Website</h1>
+
+    <p>This is my first deployed static website.</p>
+
+    <button onclick="alert('Website is working!')">
+        Click Me
+    </button>
+
+</body>
+</html>
+```
+
+Save and close.
+
+## Step 3. Test website locally
+
+Open the folder.
+
+Double-click `index.html`.
+
+Your website should open in the browser.
+
+## Step 4. Initialize Git
+
+In PowerShell:
+
+```
+git init
+```
+
+Add files:
+
+```
+git add .
+```
+
+Commit:
+
+```
+git commit -m "Initial website"
+```
+
+Set branch:
+
+```
+git branch -M main
+```
+
+## Step 5. Create GitHub repository
+
+1. Open [GitHub](https://github.com?utm_source=chatgpt.com).
+2. Click New Repository.
+3. Repository name: `static-website`.
+4. Select Public.
+5. Click Create Repository.
+
+Copy your repository URL.
+
+## Step 6. Push project to GitHub
+
+```
+git remote add origin https://github.com/USERNAME/static-website.git
+```
+
+Push:
+
+```
+git push -u origin main
+```
+
+Replace `USERNAME` with your GitHub username.
+
+## Step 7. Deploy using Vercel
+
+1. Open [Vercel](https://vercel.com?utm_source=chatgpt.com).
+2. Sign in using GitHub.
+3. Click Add New → Project.
+4. Select `static-website`.
+5. Click Import.
+
+## Step 8. Configure deployment
+
+Use these settings:
+
+| Setting          | Value       |
+| ---------------- | ----------- |
+| Framework Preset | Other       |
+| Root Directory   | `./`        |
+| Build Command    | Leave empty |
+| Output Directory | `./`        |
+| Install Command  | Leave empty |
+
+Click Deploy.
+
+## Step 9. Verify deployment
+
+After deployment, Vercel provides a website URL similar to:
+
+```
+https://static-website.vercel.app
+```
+
+Open the URL.
+
+You should see:
+
+- Welcome to My Website
+- Description
+- Click Me button
+
+## Step 10. Update deployed website
+
+Make a change to `index.html`.
+
+Then run:
+
+```
+git add .
+git commit -m "Updated website"
+git push origin main
+```
+
+Vercel automatically detects the GitHub update and deploys the new version.
+
