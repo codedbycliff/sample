@@ -1,0 +1,202 @@
+Exp 5: Remote File Access via FTP/WinSCP & Git Init/Push to GitHub
+# 1. On Ubuntu VM: Navigate to folder and create test file
+mkdir -p ~/exp5 && cd ~/exp5
+echo "Hello World" > file1.txt
+
+# 2. Configure Git Identity
+git config --global user.name "codedbycliff"
+git config --global user.email "rodriguescliff7@gmail.com"
+
+# 3. Initialize Git repo and commit
+git init
+git status
+git add file1.txt
+git commit -m "initial commit for exp5"
+git branch -M main
+
+# 4. Link to GitHub repository and push
+git remote add origin https://github.com/codedbycliff/test.git
+git push -u origin main --force
+# (Enter GitHub username and Personal Access Token when prompted)
+
+# Note: For Remote File Access, connect FileZilla or WinSCP using:
+# Host: 127.0.0.1 (or VM IP), Port: 2222 (or 22), User: vboxuser
+
+ 
+Exp 6: Remote Access & Git Sync (Host & VM + WinSCP/FileZilla Validation)
+# 1. On VM: Clone the repository
+cd ~
+git clone https://github.com/codedbycliff/test.git
+cd test
+
+# 2. Check status and push updates from VM / Host
+git status
+git add .
+git commit -m "Sync update"
+git push origin main
+
+# 3. Pull latest changes to synchronize
+git pull origin main
+
+# 4. WinSCP / FileZilla Validation:
+# Open WinSCP/FileZilla -> Connect to 127.0.0.1:2222 -> Navigate to /home/vboxuser/exp5/
+# Verify file1.txt and test directory are visible and synchronized.
+
+ 
+Exp 7: Git Multi-User Collaboration & Synchronization (Access Server)
+# 1. Collaborator (Friend) clones repo and makes changes (on Host or second terminal):
+git clone https://github.com/codedbycliff/test.git
+cd test
+echo "My First commit for the lab collab project." > readme.md
+git add .
+git commit -m "Add initial README file"
+git push origin main
+# (Authenticate with collaborator credentials)
+
+# 2. Owner pulls changes on VM:
+cd ~/exp5
+git pull origin main
+cat readme.md
+
+ 
+Exp 8: Static Web Deployment on Vercel & Remote MySQL Server Config
+# PART A: HTML Page Creation & GitHub/Vercel Deployment
+mkdir -p ~/portfolio && cd ~/portfolio
+
+cat << 'EOF' > index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>My Cloud Portfolio</title>
+   <style>
+       body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+       h1 { color: #2c3e50; }
+   </style>
+</head>
+<body>
+   <h1>Hello, cloud!</h1>
+   <p>This page is deployed from a GitHub repository using Vercel.</p>
+   <p>Student Name: Salil Pai Raikar</p>
+</body>
+</html>
+EOF
+
+# Push to GitHub
+git init
+git add .
+git commit -m "Add initial portfolio page"
+git branch -M main
+git remote add origin https://github.com/codedbycliff/portfolio.git
+git push -u origin main
+# Import repo on https://vercel.com and deploy to get live URL.
+
+# PART B: Install MySQL & Configure Remote Database
+sudo apt install mysql-server -y
+sudo mysql -u root
+
+-- Inside MySQL Shell:
+CREATE DATABASE cc_db;
+USE cc_db;
+CREATE TABLE users (
+   id INT PRIMARY KEY,
+   name VARCHAR(30),
+   email VARCHAR(50),
+   contact VARCHAR(12),
+   address VARCHAR(200)
+);
+INSERT INTO users (id, name, email, contact, address) VALUES (69, 'Vinay', 'vinaygupta0758@gmail.com', '1234567890', 'Panjim');
+SELECT * FROM users;
+
+-- Enable remote user and grant privileges:
+CREATE USER 'remoteuser'@'%' IDENTIFIED BY 'vboxuser';
+GRANT ALL PRIVILEGES ON *.* TO 'remoteuser'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EXIT;
+
+-- Edit MySQL bind-address to allow remote connections:
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+# Change: bind-address = 127.0.0.1  -->  bind-address = 0.0.0.0
+sudo systemctl restart mysql
+
+ 
+
+Exp 9: Split Deployment - Vercel Form Frontend + Ngrok Tunnel + MySQL Backend
+# 1. Install Apache, PHP, MySQL stack
+sudo apt install apache2 php libapache2-mod-php mysql-server php-mysql -y
+
+# 2. Create Database and Table in MySQL
+sudo mysql -u root
+
+-- Inside MySQL:
+CREATE DATABASE web_project;
+USE web_project;
+CREATE TABLE contacts (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR(50),
+   email VARCHAR(100),
+   message TEXT
+);
+EXIT;
+
+# 3. Create Backend PHP Script (/var/www/html/submit.php)
+sudo tee /var/www/html/submit.php << 'EOF'
+<?php
+$conn = new mysqli("localhost", "root", "", "web_project");
+if ($conn->connect_error) {
+   die("Connection failed: " . $conn->connect_error);
+}
+$name = $_POST['name'];
+$email = $_POST['email'];
+$message = $_POST['message'];
+
+$sql = "INSERT INTO contacts (name, email, message) VALUES ('name','email', '$message')";
+if (conn->query(sql) === TRUE) {
+   echo "Data saved successfully!";
+} else {
+   echo "Error: " . $sql . "<br>" . $conn->error;
+}
+$conn->close();
+?>
+EOF
+
+# 4. Install and Start Ngrok Tunnel (to expose local Apache to Vercel frontend)
+mkdir -p ~/ngrok-setup && cd ~/ngrok-setup
+wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+tar -xvzf ngrok-v3-stable-linux-amd64.tgz
+sudo mv ngrok /usr/local/bin/
+
+# Authenticate ngrok and expose Port 80:
+# (Replace with your own authtoken if needed)
+ngrok config add-authtoken 3K3NP7STN3MNE6L35r6x130b2eP_5uAqExGEy8Uq8cyn9m513
+ngrok http 80
+# Copy the Forwarding HTTPS URL: e.g., https://your-subdomain.ngrok-free.dev
+
+# 5. Create Frontend HTML Form (Deploy this repo to Vercel)
+# Replace the action URL with your ngrok forwarding URL:
+cat << 'EOF' > index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Contact Form</title>
+</head>
+<body>
+   <h1>Contact Us</h1>
+   <form action="https://your-subdomain.ngrok-free.dev/submit.php" method="POST">
+       <input type="text" name="name" placeholder="Enter your name" required><br><br>
+       <input type="email" name="email" placeholder="Enter your email" required><br><br>
+       <textarea name="message" placeholder="Enter your message"></textarea><br><br>
+       <button type="submit">Submit</button>
+   </form>
+</body>
+</html>
+EOF
+
+# 6. Verify Form Submission in MySQL Backend:
+sudo mysql -u root -e "USE web_project; SELECT * FROM contacts;"
+
+ 
+
